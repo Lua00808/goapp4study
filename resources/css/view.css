@@ -1,0 +1,12 @@
+header {
+    height:50px;
+    line-height:50px;
+    border:1px solid lightgray;
+    text-align: center;
+    color: rgb(249, 252, 252);
+    background-color: rgb(249, 252, 252);    
+}
+.tweet_view {
+    float: left;
+
+}
