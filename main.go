@@ -19,11 +19,29 @@ type Tweets struct {
 var DbConnection *sql.DB
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
+	DbConnection, _ := sql.Open("sqlite3", "./example.sql")
+	defer DbConnection.Close()
+	cmd := `SELECT * from tweets`
+	rows, err := DbConnection.Query(cmd)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var body []Tweets
+	for rows.Next() { // bool を返す
+		var b Tweets
+		err := rows.Scan(&b.Id, &b.Tweet)
+		if err != nil {
+			log.Fatal(err)
+		}
+		body = append(body, b)
+	}
+
 	t, err := template.ParseFiles("views/index.html")
 	if err != nil {
 		log.Fatal(err)
 	}
-	t.Execute(w, nil)
+	t.Execute(w, body)
 }
 
 func getPostTweet(w http.ResponseWriter, r *http.Request) {
