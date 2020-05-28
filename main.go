@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"strconv"
 	"text/template"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -53,9 +54,21 @@ func getPostTweet(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
+func deleteTweet(w http.ResponseWriter, r *http.Request) {
+	DbConnection, _ := sql.Open("sqlite3", "./example.sql")
+	defer DbConnection.Close()
+	cmd := `DELETE FROM tweets WHERE id = ?`
+	i := r.FormValue("tweet_delete")
+	var I int
+	I, _ = strconv.Atoi(i)
+	DbConnection.Exec(cmd, I)
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
 func main() {
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources/"))))
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/tweet/", getPostTweet)
+	http.HandleFunc("/tweet_delete/", deleteTweet)
 	http.ListenAndServe(":8080", nil)
 }
